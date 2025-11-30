@@ -248,10 +248,10 @@ public:
 
 		if (PluginRunning && ReverseNX_RT->pluginActive) {
 
-			auto *clickableListItem = new tsl::elm::ListItem("Change system control");
+			auto *clickableListItem = new tsl::elm::ListItem("Reset to System Control");
 			clickableListItem->setClickListener([](u64 keys) { 
 				if ((keys & HidNpadButton_A) && PluginRunning) {
-					ReverseNX_RT->def = !(ReverseNX_RT->def);
+					ReverseNX_RT->def = true;
 					tsl::goBack();
 					tsl::changeTo<GuiTest>(1, 2, true);
 					return true;
@@ -267,6 +267,8 @@ public:
 				auto *clickableListItem2 = new tsl::elm::ListItem("Change mode");
 				clickableListItem2->setClickListener([](u64 keys) { 
 					if ((keys & HidNpadButton_A) && PluginRunning) {
+						// Automatically disable "Controlled by System" when changing mode
+						ReverseNX_RT->def = false;
 						ReverseNX_RT->isDocked = !(ReverseNX_RT->isDocked);
 						return true;
 					}
@@ -298,6 +300,23 @@ public:
 					});
 					list->addItem(clickableListItem4);
 				}
+			}
+			else {
+				// Show option to disable system control only when it's currently enabled
+				auto *clickableListItem2 = new tsl::elm::ListItem("Change mode");
+				clickableListItem2->setClickListener([](u64 keys) { 
+					if ((keys & HidNpadButton_A) && PluginRunning) {
+						// Automatically disable "Controlled by System" when changing mode
+						ReverseNX_RT->def = false;
+						ReverseNX_RT->isDocked = !(ReverseNX_RT->isDocked);
+						tsl::goBack();
+						tsl::changeTo<GuiTest>(1, 2, true);
+						return true;
+					}
+					
+					return false;
+				});
+				list->addItem(clickableListItem2);
 			}
 
 			auto *clickableListItem3 = new tsl::elm::ListItem("Save current settings");
